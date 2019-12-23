@@ -1,0 +1,46 @@
+nginx:
+    image: nginx:latest
+    ports:
+        - '80:80'
+    volumes:
+    # contains the volumes from the ngnix/wordpress.conf:  
+        # Ngnix volumes configuration
+        - ./nginx:/etc/nginx/conf.d
+        # volumes for Ngnix Logs Configuration
+        - ./logs/nginx:/var/log/nginx
+        # Volumes for Wordpress Root
+        - ./wordpress:/var/www/html
+    links:
+        # Links the Nginx containr to the Wordpress container
+        - wordpress
+    # restart Container
+    restart: always
+mysql:
+    # Take the mariadb image from the docker hub
+    image: mariadb
+    ports:
+        - '3306:3306'
+    volumes:
+    # Volume for mariadb data base
+        - ./db-data:/var/lib/mysql
+    environment:
+    # Configure a Password for root mysql user
+        - MYSQL_ROOT_PASSWORD=aqwe123
+    restart: always
+wordpress:
+    # Take The wordpress4.7.1 Image 
+    image: wordpress:4.7.1-php7.0-fpm
+    ports:
+        - '9000:9000'
+    volumes:
+    # Volume for wordprees
+        - ./wordpress:/var/www/html
+    environment:
+        # create row for the wordpress APP
+        - WORDPRESS_DB_NAME=wpdb
+        - WORDPRESS_TABLE_PREFIX=wp_
+        - WORDPRESS_DB_HOST=mysql
+        - WORDPRESS_DB_PASSWORD=aqwe123
+    links:
+        - mysql
+    restart: always
